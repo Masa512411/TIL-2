@@ -114,7 +114,7 @@ npm install ejs --save
 ```js
 app.set('view engine', 'ejs') // 뷰엔진은 ejs를 사용하겠다라고 세팅
 
-res.sender('email.ejs', {'email' : req.body.email}) // 'email.ejs'라는 템플릿파일과 오브젝트 형식의 데이터를 결합하여 클라이언트에게 보내준다.
+res.render('email.ejs', {'email' : req.body.email}) // 'email.ejs'라는 템플릿파일과 오브젝트 형식의 데이터를 결합하여 클라이언트에게 보내준다.
 ```
 
 >view는 지정된 디렉토리네임이 있다. -> views
