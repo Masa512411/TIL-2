@@ -87,3 +87,12 @@ bfg --delete-files 1.txt
 
 깃 저장소를 지우는 방법 :
 rm -rf .git
+
+git stash
+잠시 작업 내용을 저장할 때 사용하는 유용한 명령어
+stash가 만들어낸 임시 공간에 저장되어 진다.
+여러개의 작업 임시 공간을 만들어 낼 수 있다.
+git stash --list : 임시 공간 확인
+git stash apply [아이디]: 임시 공간에 저장된 작업 내용을 덮어 씌운다. 반영되고 리스트에 남아있는다.
+git stash pop [아이디]:  작업 내용을 덮어 씌운다. 리스트에서 사라진다.
+git stash drop [아이디] : 리스트에 있는 작업 내용을 버릴때
