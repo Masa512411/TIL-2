@@ -312,3 +312,116 @@ var router = require('./router/index')  // 라우팅을 담당할 index.js를 �
 
 app.use(router)   // app으로 들어오는 라우팅을 router쪽으로 보낸다.
 ```
+
+#### passport 모듈을 이용한 로그인 session 처리
+>로그인한 정보를 서버의 메모리나 디비에 저장하는 것
+
+>로그인한 정보의 상태값을 확인하고 유지하면서 로직을 처리
+
+###### 환경구축
+
+```
+npm install passport passport-local express-session connect-flash --save-dev
+```
+>passport : 인증관련 모듈 처리
+
+>passport-local : 일반적인 로그인 처리 방법 사용
+
+>express-session : session 관련 처리
+
+>connect-flash : 리다이렉트 과정중 에러메시지 전달
+
+>[passport](passportjs.org)
+
+```js
+var passport = require('passport')
+var LocalStrategy = require('passport-local').Strategy
+var session = require('express-session')
+var flash = require('connect-flash')
+```
+
+###### middleware 설정
+```js
+app.use(session({
+  secret : 'keyboard cat',
+  resave : false,
+  saveUninitialized : true
+}))
+app.use(passport.initialize())
+app.use(passport.session())
+app.use(flash())
+```
+
+session 사용 간 디폴트 값들 : secret, resave, saveUninitialized 세 값은 꼭 넣어줘야함.
+
+
+###### passport strategy 만들기
+
+```js
+passport.use('local-join', new LocalStrategy({
+  usernameField : 'email',
+  passwordField : 'password',
+  passReqToCallback : true
+}, function(req, email, password, done) {
+  console.log('local-join callback called')
+}
+))
+```
+
+form 태그를 통해 전달받는 input 값의 이름들을 적어준다.
+
+passReqToCallback : 콜백함수에게 값을 전달해 주겠다.
+
+콜백함수에서 디비에 저장된 값과 같은지 확인하는 절차를 수행한다.
+
+###### passport router 처리
+```js
+router.post('/', passport.authenticate('local-join', {
+  successRedirect : '/main',  // 성공했을시
+  failureRedirect : '/join',  // 실패했을시
+  failureFlash : true
+}))
+```
+
+콜백함수를 쓰거나 객체리터럴을 넘겨주면 authenticate가 처리를 할 것이다.
+
+###### passport strategy callback 함수 만들기
+
+```js
+router.get('/', function(req, res) {
+  var msg;
+  var errMsg = req.flash('error') // flash 모듈을 사용하여 에러메시지 받아오기
+  if(errMsg) msg = errMsg
+  res.render('join.ejs', {message : msg})
+})
+
+passport.use('local-join', new LocalStrategy({
+  usernameField : 'email',
+  passwordField : 'password',
+  passReqToCallback : true
+}, function(req, email, password, done) {
+  var query = connection.query('select * from user where email=?', [email], function(err, rows) {
+    if(err) return done(err)
+
+    if(rows.length) {
+      console.log('existed user')
+      return done(null, false, {message : 'your email is already used'})  // 실패사항일때
+    } else {
+      var sql = {email : email, password : password}
+      var query = connection.query('insert into user set ?', sql, function(err, rows) {
+        if(err) throw err
+        return done(null, {'email' : email, 'id' : rows.insertId})  // 성공했을때, serialize 부분을 통해 done 함수가 실행된다.
+      })
+    }
+  })
+}
+))
+```
+
+done 함수를 통해서 결과값을 리턴해준다.
+
+done(null, false) false 이면 실패했을때 리다이렉트 페이지로 넘어가며 메세지를 넘겨주게 된다.
+
+넘겨준 메시지는 리다이렉트 페이지 url의 라우터 처리함수에서 req.flash('error')를 통해 받아올수 있다.
+
+성공했을 시에는 serialize 라는 부분이 필요하다.
