@@ -374,7 +374,7 @@ passReqToCallback : 콜백함수에게 값을 전달해 주겠다.
 
 콜백함수에서 디비에 저장된 값과 같은지 확인하는 절차를 수행한다.
 
-###### passport router 처리
+###### passport router 처리 디폴트 방식
 ```js
 router.post('/', passport.authenticate('local-join', {
   successRedirect : '/main',  // 성공했을시
@@ -393,6 +393,14 @@ router.get('/', function(req, res) {
   var errMsg = req.flash('error') // flash 모듈을 사용하여 에러메시지 받아오기
   if(errMsg) msg = errMsg
   res.render('join.ejs', {message : msg})
+})
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id)
+})
+
+passport.deserializeUser(function(id, done) {
+  done(null, id)
 })
 
 passport.use('local-join', new LocalStrategy({
@@ -424,4 +432,51 @@ done(null, false) false 이면 실패했을때 리다이렉트 페이지로 넘�
 
 넘겨준 메시지는 리다이렉트 페이지 url의 라우터 처리함수에서 req.flash('error')를 통해 받아올수 있다.
 
-성공했을 시에는 serialize 라는 부분이 필요하다.
+serializeUser : 로그인에 성공했을때 정보를 session에 저장하는 역할이다.
+
+deserializeUser : 페이지 이동 시 session 정보를 넘겨주는 역할이다. req.user 객체로 사용 할 수 있다.
+
+두 함수는 필수로 쓰이는 함수이다.
+
+###### custom callback 만들어서 ajax 요청에 json으로 응답하기, 로그인(login)
+```js
+router.post('/', function(req, res, next) {
+  passport.authenticate('local-login', function(err, user, info) {
+    if(err) res.status(500).json(err)
+    if(!user) return res.status(401).json(info.message)
+
+    req.logIn(user, function(err) {
+      if(err) return next(err)
+      return res.json(user)
+    })
+  })(req, res, next)
+})
+```
+
+발생하는 모든 상황을 json 형식으로 응답한다. 로그인이 성공되면 session에 정보가 저장되며 user 객체를 클라이언트에게 응답한다.
+
+로그인 성공하면 req.logIn의 user 객체에 데이터가 넘겨진다.
+
+###### 로그아웃(logout)
+```js
+router.get('/', function(req, res) {
+  var id = req.user
+  if(!id) res.render('login.ejs')
+  res.render('main.ejs', {'id' : id})
+})
+```
+
+세션값이 없으면 로그인 페이지로 리다이렉트 시키고 세션값이 있으면 메인페이지로 유저정보와 함께 리다이렉트 시킨다.
+
+```js
+app.get('/logout', function(req, res) {
+  res.logout()
+  res.redirect('/')
+})
+```
+
+로그아웃 모듈을 만들고 처리해준다.
+
+res.render와 res.redirect의 차이점을 잘 생각해보자
+render는 url은 바뀌지 않고 내부의 html만 바뀌고
+redirect는 url 자체를 변경시켜 새로운 페이지로 이동한다.
