@@ -313,6 +313,35 @@ var router = require('./router/index')  // 라우팅을 담당할 index.js를 �
 app.use(router)   // app으로 들어오는 라우팅을 router쪽으로 보낸다.
 ```
 
+#### DB 데이터 추가 방법
+```js
+var body = req.body
+var email = body.email
+var name = body.name
+var passwd = body.password
+
+// 기본적인 insert 쿼리 문장
+var query = connection.query('insert into user (email, name, pw) values ("' + email + '", "' + name + '", "' + passwd + '")', function(err, rows) {
+  if(err) throw err
+
+  if(rows) {
+    console.log(rows)
+  }
+})
+
+// set을 이용한 insert 쿼리 문장
+var sql = {email : email, name : name, pw : passwd}
+var query = connection.query('insert into user set ?', sql, function(err, rows) {
+  if(err) throw err
+
+  if(rows) {
+    console.log(rows)
+  }
+})
+```
+insert 쿼리문이 성공하면 rows에 해당하는 데이터 값들이 들어 있다.
+
+
 #### passport 모듈을 이용한 로그인 session 처리
 >로그인한 정보를 서버의 메모리나 디비에 저장하는 것
 
