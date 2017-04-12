@@ -110,6 +110,7 @@ react best practice 의 코드 제작자가 원제작자인 것을 찾아보자.
 경험이 없으면 Angular(기본적인 틀이 있어서 적용하기 쉽다) 경험이 어느 정도 있으면 React(필요한 컴포넌트들을 개발해서 넣기 쉽다)
 
 iterator가 되는 태그들은(li) key 속성을 부여해주면 virtual DOM이 작업하기 수월해진다.
+key 값은 1,2,3,4 같은 숫자보다는 데이터의 고유한 값으로 넣는 것이 좋다.
 
 #### Component에 Event 등록해보기
 ```js
@@ -198,3 +199,55 @@ this.props.XXX 를 통해서 하위 컴포넌트에서 인자로 전달 받아 �
 
 #### functional component
 렌더링만 담당하는 부분은 함수로 만들어서 리턴만 시켜주는 방식이 있다.
+
+#### binding
+React는 binding을 constructor 에서 하도록 권장한다.
+굳이 안지켜도 되긴 하다.
+
+#### React 에서 ajax 통신하기
+fetch : promise 패턴을 적용한 ajax
+axios
+
+#### should component update
+컴포넌트의 업데이트를 수동적으로 조절해주는 방법
+
+#### React.createApp
+리액트의 설정을 자동으로 해주는 장치
+
+#### React-Redux
+데이터, 스토어, 스테이츠, 모델 다 같은 의미이다.
+react는 스토어라고 부른다.
+내부적으로 스테이츠를 취합해서 스토어로 합친다.
+
+프레임워크의 목표 : 단방향으로의 데이터 처리의 흐름으로 예측가능하고 이해하기 쉬운 프로그래밍
+
+Redux는 React에 사용되는 데이터 처리의 플러그인일 뿐이다.
+
+#### Flux
+
+Action : 사용자가 일으킨 이벤트
+Dispatcher : 발생한 이벤트를 store에게 알려줌
+Store : store는 dispatcher에게 받은 이벤트에 따라 준비된대로 상태값을 바꾼다. 그리고난후 view 에게 상태값이 바뀌었다고 알려준다.
+View : view는 store에게 값이 바꼇다고 알림을 받으면 바뀐 값을 요청하고 화면을 다시 렌더링 한다. 렌더링한 결과에 따라 다시 액션이 생겨서 디스패쳐에게 전달할 수도 있다.
+
+Store : 상태값을 모아놓은 객체
+Reducer : 상태값(스테이츠)을 바꾸는 함수들의 집합
+
+store.dispatch(action)
+
+#### 구독과 발행
+Store 와 View의 관계 -> Redux에서 가장 중요한 부분이다.
+view는 store를 구독하고 store는 발행한다(?)
+root view는 store 객체를 받아서 하위 컴포넌트들에게 props로 넘겨주고 렌더링시킨다.
+
+#### Redux
+store는 이벤트가 들어올때마다 스테이츠를 새로 만든다.
+
+Redux의 흐름
+view 컴포넌트는 액션 메소드 호출
+디스패쳐는 해당 액션의 결과를 객체로 반환
+리듀서는 받은 객체를 해석하여 현재 스테이츠를 복사하여 새로운 스테이츠 값으로 변환
+스토어는 스테이츠가 바꼈다는걸 뷰에게 알리고
+뷰는 스토어에게 스테이츠를 요청 뷰를 다시 렌더링한다.
+
+#### view layer binding
