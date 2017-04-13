@@ -140,7 +140,17 @@ carList.add(c);
 Car x = carList.get(0);
 ```
 
-###### 해쉬맵
+###### 해시맵, 해시테이블
+해시맵 : 동기화 미지원, 성능은 더 좋다.
+해시테이블 : 동기화 지원, 여러명이 쓸때 쓰인다.
+
+```java
+HashMap <String, Integer> hashmap = new HashMap(String, Integer);
+```
+
+<Key, Value> 키와 밸류로 이루어져 있다.
+
+해시는 일부러 데이터를 50%이상 채우지 않도록 한다.
 
 ###### 제네릭
 
