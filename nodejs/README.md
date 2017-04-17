@@ -509,3 +509,5 @@ app.get('/logout', function(req, res) {
 res.render와 res.redirect의 차이점을 잘 생각해보자
 render는 url은 바뀌지 않고 내부의 html만 바뀌고
 redirect는 url 자체를 변경시켜 새로운 페이지로 이동한다.
+
+#### npm script
