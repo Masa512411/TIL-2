@@ -511,3 +511,119 @@ render는 url은 바뀌지 않고 내부의 html만 바뀌고
 redirect는 url 자체를 변경시켜 새로운 페이지로 이동한다.
 
 #### npm script
+
+#### Restful API
+
+REpresentational State Transfer : 네트워크 어플리케이션의 구조적인 스타일 중의 하나
+
+###### REST한 방식의 API란
+- 웹을 근간으로 하는 HTTP Protocol 기반이다.
+- 리소스(자원)는 URI(Uniform Resource Identifiers)로 표현하며 말 그대로 '고유'해야한다.
+- URI는 단순하고 직관적인 구조여야 한다.
+- 리소스의 상태는 HTTP Methods를 활용해서 구분한다.
+- xml/json을 활용해서 데이터를 전송한다.(주로 json)
+- URI는 동사보다는 명사를 주로 활용해서 나타낸다.
+
+###### CRUD
+네트워크를 통해 웹 리소스(Resource)를 다루기 위한 행위들
+- Create(POST)
+- Retrieve(GET)
+- Update(PUT)
+- Delete(DELETE)
+
+###### API Design
+- 복수명사를 사용(/movies)
+- 필요하면 URL에 하위 자원을 표현(/movies/23), (/movies/titanic) - 단수명사의 할용 (/복수명사/단수명사)
+- 필터조건을 허용 할 수 있다(/movies?state=active)
+- API 개발간의 버전을 표시할 수도 있다.(OPEN API)
+
+###### Example
+| URL | Methods | 설명 |
+| :------------- | :------------- | :------------- |
+| /movies        | GET            | 모든 영화리스트 가져오기   |
+| /movies        | POST           | 영화 추가하기           |
+| /movies/:title | GET            | title 해당 영화 가져오기 |
+| /movies/:title | DELETE         | title 해당 영화 삭제    |
+| /movies/:title | PUT            | title 해당 영화 업데이트 |
+| /movies?min=9  | GET            | 상영중이 영화리스트       |
+
+###### RESTful API GET
+```js
+router.get('/', function(req, res) {
+  var responseData = {}
+
+  var query = connect.query('select title from movie', function(err, rows) {
+    if(err) throw err
+
+    if(rows.length) {
+      responseData.result = 1
+      responseData.data = rows
+    } else {
+      responseData.result = 0
+    }
+
+    res.json(responseData)
+  })
+})
+```
+
+###### RESTful API POST
+```js
+router.post('/', function(req, res) {
+  var title = req.body.title
+  var type = req.body.type
+  var grade = req.body.grade
+  var actor = req.body.actor
+
+  var sql = {title, type, grade, actor} // es6 문법
+  var query = connect.query('insert into movie set ?', sql, function(err, rows) {
+    if(err) throw err
+
+    return res.json({'result' : 1})
+  })
+})
+```
+
+###### RESTful API GET SUB-URI
+```js
+router.get('/:title', function(req, res) {
+  var title = req.params.title
+
+  var responseData = {}
+
+  var query = connect.query('select * from movie where title = ?', [title], function(err, rows) {
+    if(err) throw err
+
+    if(rows[0]) {
+      responseData.result = 1
+      responseData.data = rows
+    } else {
+      responseData.result = 0
+    }
+
+    res.json(responseData)
+  })
+})
+```
+
+###### RESTful API DELETE
+```js
+router.delete('/:title', function(req, res) {
+  var title = req.params.title
+
+  var responseData = {}
+
+  var query = connect.query('delete from movie where title = ?', [title], function(err, rows) {
+    if(err) throw err
+
+    if(rows.affectedRows > 0) {
+      responseData.result = 1
+      responseData.data = title
+    } else {
+      responseData.result = 0
+    }
+
+    res.json(responseData)
+  })
+})
+```
