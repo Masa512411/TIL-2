@@ -486,6 +486,10 @@ router.post('/', function(req, res, next) {
 
 로그인 성공하면 req.logIn의 user 객체에 데이터가 넘겨진다.
 
+> req.logIn을 사용하는 이유 : passport.authenticate 는 인증에 성공하면 자동적으로 serializeUser에게 Session 값을 저장하게 한다.
+>
+> 하지만 Custom Callback을 사용할 경우 인증에 성공하더라도 자동으로 저장하지 않고 req.logIn 으로 사용자가 직접 응답을 보내 serializeUser가 Session 값을 저장하게 해야 한다.
+
 ###### 로그아웃(logout)
 ```js
 router.get('/', function(req, res) {
