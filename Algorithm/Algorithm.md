@@ -26,3 +26,9 @@ O(n^2) : Join
 
 빅오와 오메가가 같은 경우의 성능을 나타낸다.
 C1g(n) <= f(n) <= C2g(n)
+
+#### Sort
+Insertion Sort : n^2, 정렬되어 있는 경우에는 n
+- 이미 정렬되어 있는 테이블에 원소를 추가하고 정렬할 경우에는 Insertion Sort를 선택하는게 좋다.
+Quick Sort : nlogn
+- pivot 값을 잘 뽑아야 성능이 좋다. 맨처음값, 중간값, 맨끝값 3개를 선택하고 그중에 중간값을 뽑아서 pivot값을 정한다.
